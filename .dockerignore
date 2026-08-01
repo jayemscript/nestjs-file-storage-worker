@@ -1,36 +1,14 @@
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Environment files — never bake credentials into the image
+node_modules
+npm-debug.log
+dist
 .env
 .env.local
-.env.*.local
-
-# Docker files themselves
-Dockerfile
-*.dockerfile
-docker-compose*.yaml
-
-# Git
-.git/
+.env.development
+.env.example
+.git
 .gitignore
-
-# Logs
-logs/
-*.log
-
-# OS
+README.md
+.vscode
+.idea
+coverage
 .DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Test
-coverage/
-**/*.spec.ts
-**/*.test.ts
