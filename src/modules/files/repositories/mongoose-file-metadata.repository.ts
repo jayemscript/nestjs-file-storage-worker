@@ -52,6 +52,23 @@ export class MongooseFileMetadataRepository implements FileMetadataRepository {
     });
   }
 
+  async findDeletedBefore(
+    deletedBefore: Date,
+    limit: number,
+  ): Promise<FileMetadataRecord[]> {
+    return this.execute(async () => {
+      const documents = await this.model
+        .find({
+          status: FileStatus.DELETED,
+          deletedAt: { $lte: deletedBefore },
+        })
+        .sort({ deletedAt: 1 })
+        .limit(limit)
+        .exec();
+      return documents.map((document) => this.toRecord(document));
+    });
+  }
+
   async markDeleted(
     fileId: string,
     appId: string,

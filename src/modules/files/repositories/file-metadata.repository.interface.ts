@@ -15,6 +15,10 @@ export interface FileMetadataRepository {
     fileId: string,
     appId: string,
   ) => Promise<FileMetadataRecord | null>;
+  findDeletedBefore: (
+    deletedBefore: Date,
+    limit: number,
+  ) => Promise<FileMetadataRecord[]>;
   markDeleted: (
     fileId: string,
     appId: string,

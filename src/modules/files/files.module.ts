@@ -24,6 +24,7 @@ import {
 } from './schemas/transfer-authorization.schema';
 import { AppContextService } from './services/app-context.service';
 import { FileValidationService } from './services/file-validation.service';
+import { FilePurgeService } from './services/file-purge.service';
 import { FilesService } from './services/files.service';
 import { TransferAuthorizationService } from './services/transfer-authorization.service';
 
@@ -54,6 +55,7 @@ import { TransferAuthorizationService } from './services/transfer-authorization.
   controllers: [FileTransfersController, FilesController],
   providers: [
     FilesService,
+    FilePurgeService,
     ApiKeyGuard,
     FileValidationService,
     AppContextService,

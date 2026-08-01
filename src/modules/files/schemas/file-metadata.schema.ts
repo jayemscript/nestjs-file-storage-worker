@@ -76,3 +76,4 @@ FileMetadataSchema.index(
   { unique: true },
 );
 FileMetadataSchema.index({ appId: 1, status: 1, createdAt: -1 });
+FileMetadataSchema.index({ status: 1, deletedAt: 1 });

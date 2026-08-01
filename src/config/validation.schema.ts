@@ -12,6 +12,8 @@ const POSITIVE_INTEGER_KEYS = [
   'TRANSFER_TOKEN_TTL_SECONDS',
   'TRANSFER_RATE_LIMIT_MAX',
   'TRANSFER_RATE_LIMIT_WINDOW_SECONDS',
+  'DELETED_FILE_RETENTION_DAYS',
+  'FILE_PURGE_BATCH_SIZE',
 ] as const;
 
 export function validateEnvironment(
@@ -72,6 +74,14 @@ export function validateEnvironment(
     !['true', 'false'].includes(transferEnabledValue.toLowerCase())
   ) {
     errors.push('TRANSFER_AUTHORIZATION_ENABLED must be true or false');
+  }
+
+  const purgeEnabledValue = environment.FILE_PURGE_ENABLED ?? 'false';
+  if (
+    typeof purgeEnabledValue !== 'string' ||
+    !['true', 'false'].includes(purgeEnabledValue.toLowerCase())
+  ) {
+    errors.push('FILE_PURGE_ENABLED must be true or false');
   }
 
   const transferEnabled =
