@@ -15,8 +15,10 @@ export const DEFAULT_ALLOWED_MIME_TYPES = [
 ] as const;
 
 export interface StorageConfiguration {
-  provider: 'local';
+  provider: 'local' | 's3';
   localRoot: string;
+  s3Region?: string;
+  s3Bucket?: string;
   maxFileSizeBytes: number;
   maxBulkFileCount: number;
   maxBulkTotalSizeBytes: number;
@@ -35,8 +37,10 @@ export default registerAs('storage', (): StorageConfiguration => {
     .filter(Boolean);
 
   return {
-    provider: 'local',
+    provider: process.env.STORAGE_PROVIDER === 's3' ? 's3' : 'local',
     localRoot: process.env.LOCAL_STORAGE_ROOT ?? './upload',
+    s3Region: process.env.AWS_S3_REGION ?? '',
+    s3Bucket: process.env.AWS_S3_BUCKET ?? '',
     maxFileSizeBytes: positiveInteger(
       process.env.MAX_FILE_SIZE_BYTES,
       10 * 1024 * 1024,

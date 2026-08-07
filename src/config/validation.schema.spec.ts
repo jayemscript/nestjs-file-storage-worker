@@ -24,10 +24,37 @@ describe('validateEnvironment', () => {
     );
   });
 
-  it('rejects inactive providers during Phase 1', () => {
+  it('accepts S3 configuration', () => {
+    const environment = {
+      ...validEnvironment,
+      STORAGE_PROVIDER: 's3',
+      AWS_S3_REGION: 'ap-southeast-1',
+      AWS_S3_BUCKET: 'meal-guides-bucket',
+      AWS_ACCESS_KEY_ID: 'test-access-key',
+      AWS_SECRET_ACCESS_KEY: 'test-secret-key',
+    };
+
+    expect(validateEnvironment(environment)).toEqual(environment);
+  });
+
+  it('requires an S3 region and bucket when S3 is selected', () => {
     expect(() =>
       validateEnvironment({ ...validEnvironment, STORAGE_PROVIDER: 's3' }),
-    ).toThrow('STORAGE_PROVIDER must be local during Phase 1');
+    ).toThrow('AWS_S3_REGION is required when STORAGE_PROVIDER is s3');
+  });
+
+  it('requires S3 credentials to be configured as a pair', () => {
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        STORAGE_PROVIDER: 's3',
+        AWS_S3_REGION: 'ap-southeast-1',
+        AWS_S3_BUCKET: 'meal-guides-bucket',
+        AWS_ACCESS_KEY_ID: 'test-access-key',
+      }),
+    ).toThrow(
+      'AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be configured together when provided',
+    );
   });
 
   it('rejects an aggregate limit smaller than a single-file limit', () => {

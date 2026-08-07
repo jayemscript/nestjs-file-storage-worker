@@ -5,14 +5,14 @@
 - File operations are scoped by both validated `appId` and MongoDB `fileId`.
 - Original filenames are sanitized display metadata and are never storage keys.
 - Storage keys are service-generated UUID paths and cannot escape the configured root.
-- Local storage rejects absolute paths, drive paths, backslashes, traversal segments, empty segments, and unsafe characters.
+- Storage adapters reject absolute paths, backslashes, traversal segments, empty segments, and unsafe key characters.
 - File signatures must match declared MIME types and a configured allowlist.
 - Multipart file/count limits and aggregate bulk limits constrain memory use.
 - Downloads use safe attachment headers and stream from storage.
 - Soft-deleted files are unavailable through normal reads/downloads.
 - Permanent deletion requires soft deletion plus a timing-safe admin-key comparison.
 - BFF-only transfer-authorization endpoints always require a registered service API key.
-- Direct local transfers use short-lived HMAC-signed, operation-scoped tokens.
+- Direct transfers use short-lived HMAC-signed, operation-scoped tokens for both local and S3 storage.
 - Transfer token IDs are stored only as SHA-256 hashes and atomically consumed once in MongoDB.
 - Upload authorizations constrain size and MIME types; download authorizations bind one application and file ID.
 - Expired authorization records are cleaned through a MongoDB TTL index.
@@ -28,7 +28,7 @@
 - Generate a long random `HARD_DELETE_ADMIN_KEY`, store it in a secret manager, rotate it, and never log it.
 - Restrict MongoDB network access, use least-privilege credentials, TLS, backups, and monitoring.
 - Keep the local storage root outside publicly served directories and apply least-privilege filesystem permissions.
-- Configure realistic upload limits for available memory. Phase 1 buffers uploads; large cloud uploads should use the authenticated Phase 2 presigned workflow.
+- Configure realistic upload limits for available memory. The current local and S3 server-mediated flows buffer uploads; direct-to-S3 presigned transfers are a separate future workflow.
 - Add malware scanning/quarantine when accepting untrusted public uploads. Magic-byte validation is not malware detection.
 - Apply gateway rate limits and request timeouts. The built-in direct-transfer limiter is per process and does not replace a distributed gateway limit for multiple replicas.
 

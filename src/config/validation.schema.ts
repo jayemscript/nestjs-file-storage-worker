@@ -29,13 +29,44 @@ export function validateEnvironment(
   }
 
   const provider = environment.STORAGE_PROVIDER ?? 'local';
-  if (provider !== 'local') {
-    errors.push('STORAGE_PROVIDER must be local during Phase 1');
+  if (provider !== 'local' && provider !== 's3') {
+    errors.push('STORAGE_PROVIDER must be either local or s3');
   }
 
   const localRoot = environment.LOCAL_STORAGE_ROOT ?? './upload';
-  if (typeof localRoot !== 'string' || localRoot.trim().length === 0) {
+  if (
+    provider === 'local' &&
+    (typeof localRoot !== 'string' || localRoot.trim().length === 0)
+  ) {
     errors.push('LOCAL_STORAGE_ROOT must be a non-empty path');
+  }
+
+  if (provider === 's3') {
+    const region = environment.AWS_S3_REGION;
+    if (typeof region !== 'string' || region.trim().length === 0) {
+      errors.push('AWS_S3_REGION is required when STORAGE_PROVIDER is s3');
+    }
+
+    const bucket = environment.AWS_S3_BUCKET;
+    if (typeof bucket !== 'string' || bucket.trim().length === 0) {
+      errors.push('AWS_S3_BUCKET is required when STORAGE_PROVIDER is s3');
+    }
+
+    const accessKeyId = environment.AWS_ACCESS_KEY_ID;
+    const secretAccessKey = environment.AWS_SECRET_ACCESS_KEY;
+    const hasAccessKeyConfiguration =
+      accessKeyId !== undefined || secretAccessKey !== undefined;
+    if (
+      hasAccessKeyConfiguration &&
+      (typeof accessKeyId !== 'string' ||
+        accessKeyId.trim().length === 0 ||
+        typeof secretAccessKey !== 'string' ||
+        secretAccessKey.trim().length === 0)
+    ) {
+      errors.push(
+        'AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be configured together when provided',
+      );
+    }
   }
 
   for (const key of POSITIVE_INTEGER_KEYS) {

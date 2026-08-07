@@ -4,10 +4,10 @@
 
 The file service owns canonical location, MIME type, size, checksum, provider, timestamps, and lifecycle state. Consuming applications should persist only `fileId`; selectively cached display metadata is non-authoritative.
 
-Phase 1 server-mediated flow:
+Server-mediated flow:
 
 ```text
-client -> FilesController -> FilesService -> StorageProvider (local)
+client -> FilesController -> FilesService -> StorageProvider (local or S3)
                                       -> FileMetadataRepository (MongoDB)
 ```
 
@@ -29,6 +29,7 @@ The BFF keeps its permanent API key. The browser receives a short-lived token wh
 - `FileMetadataRepository` isolates Mongoose and always scopes records by `appId` and `fileId`.
 - `StorageProvider` owns provider-specific object operations. Application code never receives an absolute path or SDK response.
 - `LocalStorageProvider` is the only filesystem consumer. It creates its root, rejects unsafe keys, and uses collision-safe writes.
+- `S3StorageProvider` owns AWS S3 object operations. It uses the same internal keys and rejects unsafe keys before calling AWS.
 
 The exported `FilesService` can be called from a NestJS monolith without HTTP. The controllers provide the standalone microservice API.
 
@@ -49,8 +50,8 @@ All queries include `appId` and `fileId`; cross-application access is indistingu
 
 Content is verified using magic bytes, declared MIME comparison, an allowlist, size/count limits, safe filename handling, and opaque keys. See `SECURITY.md` for remaining responsibilities.
 
-## Phase 2 S3 readiness
+## S3 provider
 
-Phase 2 adds an `S3StorageProvider` implementing the existing put/read/exists/delete/health contract with AWS PutObject, GetObject, HeadObject, DeleteObject, and bucket readiness operations. Files services, metadata schema, lifecycle behavior, and HTTP endpoints do not change.
+`S3StorageProvider` implements the existing put/read/exists/delete/health contract with AWS PutObject, GetObject, HeadObject, DeleteObject, and bucket readiness operations. Files services, metadata schema, lifecycle behavior, and HTTP endpoints do not change.
 
-Presigned upload is a separate future workflow: authorization creates an owned pending key, the client uploads to S3, and finalization verifies the object before activating metadata. It will not reuse the server-mediated endpoint or bypass application identity.
+The current S3 implementation keeps the existing server-mediated transfer flow. Presigned upload is a separate future workflow and is not enabled by selecting `STORAGE_PROVIDER=s3`.

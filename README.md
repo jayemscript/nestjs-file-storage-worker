@@ -1,6 +1,6 @@
 # NestJS File and Media Service
 
-A provider-agnostic NestJS service for file storage and metadata. Phase 1 uses a secure local filesystem provider and MongoDB metadata; AWS S3 is reserved for Phase 2.
+A provider-agnostic NestJS service for file storage and metadata. It supports a secure local filesystem provider for development and AWS S3 for staging or production without changing the file API.
 
 ## Requirements
 
@@ -28,6 +28,8 @@ A provider-agnostic NestJS service for file storage and metadata. Phase 1 uses a
 
 The local provider creates `./upload` automatically. The directory is ignored by Git and must never be committed.
 
+To use S3, set `STORAGE_PROVIDER=s3` and configure `AWS_S3_REGION` and `AWS_S3_BUCKET`. The AWS SDK uses `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` when provided, or the standard AWS credential provider chain such as an IAM role.
+
 ## Verification
 
 ```bash
@@ -48,10 +50,10 @@ Integration and e2e tests use `MONGO_TEST_URI` when present, otherwise `MONGO_UR
 - [Local transfer authorization](docs/LOCAL_TRANSFER_AUTHORIZATION_PLAN.md)
 - [Security](docs/SECURITY.md)
 
-## Phase 1 limitations
+## Current limitations
 
 - Uploads are buffered in memory within configured file/count limits. Downloads are streamed.
 - `x-app-id` identifies the consuming application; it is not authentication.
 - Short-lived local transfer authorization is opt-in and uses a process-local rate limiter. Multi-replica deployments need a distributed gateway limit.
-- Only local storage is implemented. S3 environment variables are not validated until S3 becomes the active Phase 2 provider.
+- The server-mediated transfer flow is used for both local and S3 storage. Direct browser-to-S3 presigned transfers are not implemented.
 - Files uploaded by the removed S3 proof of concept are not migrated because they have no MongoDB metadata.

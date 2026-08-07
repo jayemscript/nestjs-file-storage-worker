@@ -20,7 +20,7 @@ src/
       schemas/        File metadata and transfer authorization indexes
       services/       App context, validation, file, and transfer use cases
     storage/
-      adapters/       Local filesystem implementation
+      adapters/       Local filesystem and AWS S3 implementations
       interfaces/     Provider-agnostic storage contract
     health/            Liveness and dependency readiness
   app.module.ts        Configuration, MongoDB, files, and health composition
@@ -41,4 +41,4 @@ docs/
   SECURITY.md
 ```
 
-Only the local adapter is implemented in Phase 1. S3 and Cloudinary placeholder files were removed so an empty file cannot be mistaken for a working provider. Phase 2 adds an S3 adapter behind the existing storage contract.
+Local and S3 adapters are selected through `STORAGE_PROVIDER`. Cloudinary is not implemented.

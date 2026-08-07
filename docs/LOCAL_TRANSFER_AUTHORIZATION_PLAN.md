@@ -62,11 +62,6 @@ The built-in rate limiter is process-local. Multi-replica production deployments
 
 ## S3 migration
 
-When S3 is introduced, application authorization remains in the file service. Local and S3 keep separate transfer implementations:
+S3 storage keeps the same server-mediated authorization and transfer routes. Selecting `STORAGE_PROVIDER=s3` changes only the storage adapter used by the file service; the authorization response and browser flow remain unchanged. Switching back to `STORAGE_PROVIDER=local` continues to use the local provider.
 
-- The local provider returns a short-lived URL for a file-service transfer endpoint.
-- The S3 provider returns a short-lived S3 presigned URL.
-
-Selecting `STORAGE_PROVIDER=s3` changes which transfer response is issued at runtime; it does not remove or rewrite the local implementation. Switching back to `STORAGE_PROVIDER=local` continues to use the local signed-transfer route. A provider-agnostic authorization response should expose the transfer URL, HTTP method, required temporary headers, expiration, and finalization requirement without exposing credentials or provider-internal details.
-
-Direct-to-S3 uploads will also require a safe metadata finalization workflow, such as pending metadata followed by object verification before the file becomes active.
+Direct-to-S3 presigned uploads are a separate future workflow. They would require a safe metadata finalization workflow, such as pending metadata followed by object verification before the file becomes active, and are not enabled by this S3 adapter.
