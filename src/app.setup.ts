@@ -21,8 +21,10 @@ export function configureApplication(app: INestApplication): void {
     configService.get<string>('CORS_ORIGINS')?.split(',').filter(Boolean) ?? [];
   app.enableCors({
     origin: allowedOrigins,
-    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
+      'Pragma',
+      'Cache-Control',
       'Content-Type',
       'Authorization',
       'X-App-Id',
